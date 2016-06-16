@@ -8,6 +8,9 @@ define(function(require, exports, module) {
 	var flag=false,target=null,deg=0,startX,startY;
 	
 	function _mousedown(e){
+		if($("img.rad")[0].src==null||$("img.rad")[0].src==""){
+			return;
+		}
 		var left=$(".operation")[0].offsetLeft,
 			top=$(".operation")[0].offsetTop;
 		flag=true;
@@ -34,37 +37,33 @@ define(function(require, exports, module) {
 			switch(target.className){
 				case "left":
 					_changeLeft(op,left+aW);
-					_changeWidth(op,w-aW);
+					_changeWH(op,w-aW);
 					break;
 				case "leftUp":
 					_changeLeft(op,left+aW);
-					_changeWidth(op,w-aW);
 					_changeTop(op,top+aH);
-					_changeHeight(op,h-aH);
+					_changeWH(op,w-aW);
 					break;
 				case "up":
 					_changeTop(op,top+aH);
-					_changeHeight(op,h-aH);
+					_changeWH(op,h-aH);
 					break;
 				case "rightUp":
 					_changeTop(op,top+aH);
-					_changeHeight(op,h-aH);
-					_changeWidth(op,aW);
+					_changeWH(op,h-aH);
 					break;
 				case "right":
-					_changeWidth(op,aW);
+					_changeWH(op,aW);
 					break;
 				case "rightBottom":
-					_changeWidth(op,aW);
-					_changeHeight(op,aH);
+					_changeWH(op,aW);
 					break;
 				case "bottom":
-					_changeHeight(op,aH);
+					_changeWH(op,aH);
 					break;
 				case "leftBottom":
 					_changeLeft(op,left+aW);
-					_changeWidth(op,w-aW);
-					_changeHeight(op,aH);
+					_changeWH(op,w-aW);
 					break;
 				case "operation":
 					_changeLeft(op,x-startX);
@@ -79,29 +78,39 @@ define(function(require, exports, module) {
 	}
 	
 	function _changeLeft(obj,left){
-		obj.style.left=Math.max(0,Math.min(left,200-obj.offsetWidth))+"px";
+		var opa=$("img.opa")[0];
+		obj.style.left=Math.max(opa.offsetLeft,Math.min(left,opa.offsetLeft+opa.offsetWidth-obj.offsetWidth))+"px";
 	}
 	
 	function _changeTop(obj,top){
-		obj.style.top=Math.max(0,Math.min(top,200-obj.offsetHeight))+"px";
+		var opa=$("img.opa")[0];
+		obj.style.top=Math.max(opa.offsetTop,Math.min(top,opa.offsetTop+opa.offsetHeight-obj.offsetHeight))+"px";
 	}
 	
-	function _changeHeight(obj,height){
-		$(obj).height(Math.min(height,198-obj.offsetTop));
+	function _changeWH(obj,num){
+		var opa=$("img.opa")[0],
+			w=opa.offsetWidth,
+			h=opa.offsetHeight;
+		if(w>h){
+			obj.style.width=obj.style.height=Math.min(Math.max(50,num),h)+"px";
+		}else{
+			obj.style.width=obj.style.height=Math.min(Math.max(50,num),w)+"px";
+		}
 	}
-	
-	function _changeWidth(obj,width){
-		$(obj).width(Math.min(width,198-obj.offsetLeft));
-	}
-	
+
 	function _changeImg(obj){
-		var top=obj.offsetTop,
-			left=obj.offsetLeft,
+		var opa=$("img.opa")[0],
+			top=obj.offsetTop-opa.offsetTop,
+			left=obj.offsetLeft-opa.offsetLeft,
 			w=obj.offsetWidth,
 			h=obj.offsetHeight;
-		$(obj).prev().css({"clip":"rect("+top+"px,"+(left+w)+"px,"+(top+h)+"px,"+left+"px)"});
+		_clip($(obj).prev(),top,left,w,h);
 		
 		_changePreview(top,left,w,h);
+	}
+	
+	function _clip(obj,top,left,w,h){
+		$(obj).css({"clip":"rect("+top+"px,"+(left+w)+"px,"+(top+h)+"px,"+left+"px)"});
 	}
 	
 	function _changePreview(top,left,w,h){
@@ -220,7 +229,8 @@ define(function(require, exports, module) {
 	
 	function _restore(){
 		$(".operation").attr("style",null);
-		$(".operation").prev().css({"clip":"rect(0px,200px,200px,0px)"});
+		//_clip($(".operation").prev(),0,0,200,200);
+		//$(".operation").prev().css({"clip":"rect(0px,200px,200px,0px)"});
 	}
 	
 	function _init(){
@@ -247,13 +257,29 @@ define(function(require, exports, module) {
 	
 	function _changeSrc(src){
 		var obj=$(".operation")[0],
-			top=obj.offsetTop,
-			left=obj.offsetLeft,
+			opa=$("img.opa")[0],
+			rad=$("img.rad")[0],
+			containerW=200,
+			top,left,w,h;
+		
+		opa.src=src;
+        rad.src=src;
+        opa.onload=function(){
+        	opa.style.top=rad.style.top=opa.style.left=rad.style.left=0;
+        	if(opa.offsetWidth>opa.offsetHeight){
+        		obj.style.left=obj.style.top=opa.style.top=rad.style.top=containerW/2-containerW*opa.offsetHeight/(2*opa.offsetWidth)+"px";
+        		_changeWH(obj,opa.offsetHeight);
+            }else{
+            	obj.style.left=obj.style.top=opa.style.left=rad.style.left=containerW/2-containerW*opa.offsetWidth/(2*opa.offsetHeight)+"px";
+            	_changeWH(obj,opa.offsetWidth);
+            }
+        	top=obj.offsetTop-opa.offsetTop,
+			left=obj.offsetLeft-opa.offsetLeft,
 			w=obj.offsetWidth,
 			h=obj.offsetHeight;
-		$("img.opa")[0].src=src;
-        $("img.rad")[0].src=src;
-        _changePreview(top,left,w,h);
+        	_clip($(obj).prev(),top,left,w,h);
+        	_changePreview(top,left,w,h);
+        };
 	}
 	
 	function _result(){
