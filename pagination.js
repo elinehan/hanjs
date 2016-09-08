@@ -1,4 +1,4 @@
-﻿!function ($) {
+!function ($) {
 
     "use strict";
 
@@ -19,7 +19,6 @@
         viewBoder: false,
         viewRecords: false,
         viewRowList: true,
-
         loadingPage: null, //页面改变事件
     method
         firstPage
@@ -34,7 +33,7 @@
 
     var Pagination = function (element, options) {
         this.defoptions = {
-            language: 'en',
+            language: 'zh-cn',
             autoWidth: true,
             loaded: false,
             pageIndex: 0,
@@ -46,7 +45,7 @@
             navButtons: [], //自定义按钮[buttonicon;按钮图标class,onClickButton:按钮click回调,title:标题]
             viewBoder: false,
             viewRecords: false,
-            viewRowList: true,
+            viewRowList: false,
 
             loadingPage: null, //页面改变事件
         };
@@ -89,7 +88,7 @@
                 viewinfo = '<div dir="ltr" style="text-align:right" class="ui-paging-info">  -  共 条 </div>';
             }
 
-            this.$element.append('<div id="npg_' + thisid + '" class="nui-spager-control"><table cellspacing="0" cellpadding="0" border="0" class="nui-spager-table" style="width:100%;table-layout:fixed;height:100%;"><tbody><tr><td id="' + thisid + '_left" align="left"></td><td id="' + thisid + '_center" align="center" style="white-space: pre; width: 487px;"></td><td id="' + thisid + ' _right" align="right">' + viewinfo + '</td></tr></tbody></table></div>');
+            this.$element.append('<div id="npg_' + thisid + '" class="nui-spager-control"><table cellspacing="0" cellpadding="0" border="0" class="nui-spager-table" style="width:100%;table-layout:fixed;height:100%;"><tbody><tr><td id="' + thisid + '_center" align="center" style="white-space: pre; width: 487px;"></td><td id="' + thisid + ' _right" align="right">' + viewinfo + '</td></tr></tbody></table></div>');
             var rowlisthtml = '';
 
             if (this.options.viewRowList && this.options.rowList && this.options.rowList.length > 0) {
@@ -109,16 +108,12 @@
             pgCenterhtml = '<table cellspacing="0" cellpadding="0" border="0" style="table-layout:auto;" class="nui-spager-table">' +
                     '<tbody>' +
                         '<tr>' +
-                            '<td id="first_' + thisid + '" class="nui-spager-button ui-corner-all ui-state-disabled hidden" title="First Page"><span class="ui-icon ui-icon-seek-first"></span></td>' +
-                            '<td id="prev_' + thisid + '" class="nui-spager-button ui-corner-all ui-state-disabled" title="Previous Page"><span class="ui-icon ui-icon-seek-prev"></span></td>' +
-                            '<td class="nui-spager-button ui-state-disabled" style="width:4px;"><span class="ui-separator"></span></td>' +
+                            '<td id="prev_' + thisid + '" class="nui-spager-button ui-corner-all ui-state-disabled" title="Previous Page"><span class="ui-icon ui-icon-seek-prev">上一页</span></td>' +
                             '<td id="pagenum_' + thisid + '">';
             
-            pgCenterhtml = pgCenterhtml + '</td><td class="nui-spager-button ui-state-disabled" style="width:4px;"><span class="ui-separator"></span></td>' +
-                            '<td id="next_' + thisid + '" class="nui-spager-button ui-corner-all" title="Next Page"><span class="ui-icon ui-icon-seek-next"></span></td>' +
-                            '<td id="last_' + thisid + '" class="nui-spager-button ui-corner-all hidden" title="Last Page">' +
-                            '<span class="ui-icon ui-icon-seek-end"></span>' +
-                            '<td id="input_' + thisid + '" dir="ltr">Page <input class="nui-spager-input ui-corner-all" type="text" size="2" maxlength="7" value="0" role="textbox"> of <span id="sp_1_' + thisid + '"></span></td>' +
+            pgCenterhtml = pgCenterhtml + '</td>' +
+                            '<td id="next_' + thisid + '" class="nui-spager-button ui-corner-all" title="Next Page"><span class="ui-icon ui-icon-seek-next">下一页</span></td>' +
+                            '<td id="input_' + thisid + '" dir="ltr" class="goto">转到 <input class="nui-spager-input ui-corner-all" type="text" size="2" maxlength="7" value="0" role="textbox"> 页 <a id="goto_' + thisid + '">转到</a></td>' +
                             '</td>' + rowlisthtml +
                         '</tr>' +
                     '</tbody>' +
@@ -163,6 +158,10 @@
                 }
             });
 
+            $('#goto_' + thisid).click(function () {
+                _goto.call($('#input_' + thisid + ' input')[0]);
+            });
+
             function _goto(){
                 var pattern = /^[0-9]*[1-9][0-9]*$/;
                 var page = $(this).val().trim();
@@ -195,6 +194,8 @@
             if (this.options.loadingPage != null) {
                 this.options.loadingPage.call(this);
             }
+
+            this.reload(this.options.totalRecords);
         },
         nextPage: function () {
             //console.info('nextPage');
@@ -208,6 +209,8 @@
             if (this.options.loadingPage != null) {
                 this.options.loadingPage.call(this);
             }
+
+            this.reload(this.options.totalRecords);
         },
         lastPage: function () {
             //console.info('lastPage');
@@ -235,6 +238,7 @@
             if (this.options.loadingPage != null) {
                 this.options.loadingPage.call(this);
             }
+            this.reload(this.options.totalRecords);
         },
         reload: function (totalRecords, page) {
             var that = this;
@@ -497,4 +501,3 @@
     $.fn.pagination.Constructor = Pagination;
 
 }(window.jQuery);
-
