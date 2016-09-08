@@ -1,0 +1,43 @@
+@charset "utf-8";
+.num{
+	font-size: 16px;
+	color: #11A6FB;
+	padding: 0 6px;
+}
+.spc-right,.ui-icon{
+	color: #11A6FB;
+}
+.ui-icon{
+	cursor: pointer;
+}
+.ui-state-disabled .ui-icon,.num-current{
+	color: #9AABB8;
+	cursor: default;
+}
+.nui-spager-input{
+	width: 62px;
+	height: 26px;
+	border: 1px solid #B6DDF3;
+	padding: 0 4px;
+}
+.goto{
+	line-height: 26px;
+	color: #9AABB8;
+	padding-left: 20px;
+}
+.goto a{
+	display: inline-block;
+	width: 62px;
+	height: 26px;
+	background-color: #11A6FB;
+	color: #fff;
+	vertical-align: middle;
+	cursor: pointer;
+	margin-left: 10px;
+}
+.page{
+	padding: 20px 0;
+}
+.borderT1{
+	border-top: 1px solid #E9EEF3;
+}
